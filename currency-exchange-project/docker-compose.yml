@@ -1,0 +1,79 @@
+version: '3.8'
+
+services:
+
+  mysql-db:
+    image: mysql:8.0
+    container_name: mysql-db
+    environment:
+      MYSQL_ROOT_PASSWORD: root123
+      MYSQL_DATABASE: currencydb
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - currency-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend-1:
+    build:
+      context: ./kdu-backend-app-1
+      dockerfile: Dockerfile
+    container_name: backend-1
+    ports:
+      - "8080:8080"
+    depends_on:
+      mysql-db:
+        condition: service_healthy
+    networks:
+      - currency-network
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-db:3306/currencydb
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root123
+      FEIGN_NAME: backend-2
+      FEIGN_URL: backend-2:8081
+
+  backend-2:
+    build:
+      context: ./kdu-backend-app-2
+      dockerfile: Dockerfile
+    container_name: backend-2
+    ports:
+      - "8081:8081"
+    depends_on:
+      mysql-db:
+        condition: service_healthy
+      backend-1:
+        condition: service_started
+    networks:
+      - currency-network
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-db:3306/currencydb
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root123
+
+  frontend:
+    build:
+      context: ./kdu-frontend-app
+      dockerfile: Dockerfile
+    container_name: frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend-1
+      - backend-2
+    networks:
+      - currency-network
+
+networks:
+  currency-network:
+    driver: bridge
+
+volumes:
+  mysql_data:
