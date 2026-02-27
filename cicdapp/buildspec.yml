@@ -1,0 +1,25 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      java: corretto17
+  pre_build:
+    commands:
+      - echo "Java version:"
+      - java -version
+      - echo "Maven version:"
+      - mvn -v
+  build:
+    commands:
+      - mvn -B clean test package
+  post_build:
+    commands:
+      - echo "Build completed"
+      - ls -la target
+
+artifacts:
+  files:
+    - target/cicdapp-0.0.1-SNAPSHOT.jar
+    - Procfile
+  discard-paths: no
