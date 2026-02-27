@@ -24,7 +24,7 @@ phases:
       - ls -la target
 
 artifacts:
+  base-directory: cicdapp/target
   files:
-    - cicdapp/target/*.jar
-    - cicdapp/Procfile
-  discard-paths: no
+    - "*.war"
+  discard-paths: yes
