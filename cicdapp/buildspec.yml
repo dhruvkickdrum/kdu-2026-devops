@@ -4,6 +4,7 @@ phases:
   install:
     runtime-versions:
       java: corretto17
+
   pre_build:
     commands:
       - echo "Entering project directory"
@@ -12,16 +13,19 @@ phases:
       - java -version
       - echo "Maven version:"
       - mvn -v
+
   build:
     commands:
       - mvn -B clean test package
+
   post_build:
     commands:
       - echo "Build completed"
       - ls -la target
+      - cp target/*.war target/ROOT.war
 
 artifacts:
+  base-directory: cicdapp/target
   files:
-    - cicdapp/target/cicdapp-0.0.1-SNAPSHOT.jar
-    - cicdapp/Procfile
-  discard-paths: no
+    - ROOT.war
+  discard-paths: yes
