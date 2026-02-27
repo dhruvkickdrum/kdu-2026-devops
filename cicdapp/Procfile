@@ -1,1 +1,1 @@
-web: java -jar target/cicdapp-0.0.1-SNAPSHOT.jar
+web: java -jar cicdapp/target/cicdapp-0.0.1-SNAPSHOT.jar
