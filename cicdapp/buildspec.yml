@@ -22,9 +22,10 @@ phases:
     commands:
       - echo "Build completed"
       - ls -la target
+      - cp target/*.war target/ROOT.war
 
 artifacts:
   base-directory: cicdapp/target
   files:
-    - "*.war"
+    - ROOT.war
   discard-paths: yes
